@@ -13,30 +13,30 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 public class Worker implements Callable<Void> {
-    private int port;
+    private ServerSocket serverSocket;
     private int id;
-    public Worker(int port, int id){
-        this.port = port;
+    public Worker(ServerSocket serverSocket, int id){
+        this.serverSocket = serverSocket;
         this.id = id;
     }
 
     @Override
     public Void call() throws Exception {
-        ServerSocket serverSocket = new ServerSocket(this.port);
-        System.out.println("Waiting for a new connection...");
+
+        log("Waiting for a new connection...");
         Socket socket = serverSocket.accept();
 
-        System.out.println(" A client is connected, we're reading the content");
+        log(" A client is connected, we're reading the content");
         InputStream is = socket.getInputStream();
         byte bytes[] = new byte[1024];
         int byteRead = is.read(bytes);
         String request = new String(bytes);
 
-        System.out.println("Client is asking : " + request);
+        log("Client is asking : " + request);
         OutputStream os = socket.getOutputStream();
         os.write(getContent(request));
-        serverSocket.close();
 
+        Thread.sleep(10*1000);
         return null;
     }
 
@@ -48,11 +48,11 @@ public class Worker implements Callable<Void> {
         return query.getBytes(StandardCharsets.ISO_8859_1);
     }
 
-    private String log(String msg) {
+    private void log(String msg) {
         DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
         Date date = new Date();
         Calendar calendar = Calendar.getInstance();
 
-        System.out.printf("%s [Thread %d]: %s", format.format(calendar.getTime()),  this.id, msg);
+        System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()),  this.id, msg);
     }
 }

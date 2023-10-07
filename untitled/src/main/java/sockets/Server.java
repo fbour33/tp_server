@@ -7,32 +7,42 @@ import java.lang.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 public class Server {
     public void start() throws IOException {
+
         ServerSocket serverSocket = new ServerSocket(2134);
 
-        System.out.println("Waiting for a new connection...");
-        Socket socket = serverSocket.accept();
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        Queue<Future<Void>> resultList = new LinkedBlockingQueue<>();
 
-        System.out.println(" A client is connected, we're reading the content");
-        InputStream is = socket.getInputStream();
-        byte bytes[] = new byte[1024];
-        int byteRead = is.read(bytes);
-        String request = new String(bytes);
+        for (int id = 0; id<2; id++) {
+            log("Pile up the thread " + id);
+            Future<Void> result = pool.submit(new Worker(serverSocket, id));
+            resultList.add(result);
+        }
 
-        System.out.println("Client is asking : " + request);
-        OutputStream os = socket.getOutputStream();
-        os.write(getContent(request));
+        for (Future<Void> result : resultList) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log(e.toString());
+            }
+        }
+
+        log("Workers are in the pool, we get the results");
+
+        log("Pool shutting down");
+        pool.shutdown();
+
+        log("Closing the server socket");
         serverSocket.close();
-    }
-
-    private byte[] getContent(String request){
-        String query = "HTTP/1.1 200 OK\n" +
-                "Content-Length: 38\n" +
-                "Content-Type: text/html\n\n" +
-                "<h1>Je suis un génie (logiciel)</h1>\n";
-        return query.getBytes(StandardCharsets.ISO_8859_1);
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,5 +54,13 @@ public class Server {
             System.out.println(ex.toString());
             System.out.println("Could not connect to the server");
         }
+    }
+
+    private void log(String message) {
+        DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+
+        System.out.printf("%s [Main]: %s \n", format.format(calendar.getTime()),  message);
     }
 }
