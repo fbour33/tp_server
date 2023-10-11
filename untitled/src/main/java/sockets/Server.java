@@ -7,6 +7,13 @@ import java.lang.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 public class Server {
     public void start() throws IOException {
@@ -21,10 +28,31 @@ public class Server {
         int byteRead = is.read(bytes);
         String request = new String(bytes);
 
-        System.out.println("Client is asking : " + request);
+        log("Client is asking : " + request);
         OutputStream os = socket.getOutputStream();
         os.write(getContent(request));
         serverSocket.close();
+    }
+
+    public void startApp() throws InterruptedException, ExecutionException {
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        Queue<Future<Void>> resultList = new LinkedBlockingQueue<>();
+        for (int id = 0; id < 2; id++){
+            log("Empile le thread " + id);
+            Future<Void> result = pool.submit(new Worker((id == 0) ? 2134 : 2135, id));
+            resultList.add(result);
+        }
+
+        log("Les travaux sont dans le pool, on récupère les résultats");
+        Future<Void> result;
+        while ((result = resultList.poll()) != null) {
+            log("J'ai un résultat: " + result.get());
+        }
+
+        log("Fermeture du pool");
+        pool.shutdown();
+
+        log("Fin de la démo");
     }
 
     private byte[] getContent(String request){
@@ -35,14 +63,20 @@ public class Server {
         return query.getBytes(StandardCharsets.ISO_8859_1);
     }
 
+    private void log(String msg){
+        DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+
+        System.out.printf("%s [main]: %s\n", format.format(calendar.getTime()), msg);
+    }
+
     public static void main(String[] args) throws IOException {
         Server server = new Server();
         try {
-            server.start();
-        }
-        catch(IOException ex) {
-            System.out.println(ex.toString());
-            System.out.println("Could not connect to the server");
+            server.startApp();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
