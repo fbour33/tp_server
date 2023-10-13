@@ -13,6 +13,7 @@ public class CalculatorHeader {
     }
     public static void incrementCounter(String request){
         counter.getAndAdd(lineCounterHeader(request));
+        System.out.println("Nb Header : " + CalculatorHeader.getValue());
     }
 
     public static int getValue(){

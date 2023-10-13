@@ -12,10 +12,10 @@ import java.net.Socket;
 
 public class ListenStop implements Callable<Void> {
 
-    private final ServerSocket serverSocket;
+    private Thread threadMain;
 
-    public ListenStop(ServerSocket serverSocket){
-        this.serverSocket = serverSocket;
+    public ListenStop(Thread threadMain){
+        this.threadMain = threadMain;
     }
     private void log(String msg) {
         DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
@@ -28,8 +28,12 @@ public class ListenStop implements Callable<Void> {
     @Override
     public Void call() throws Exception {
 
-        log("Waiting for a new connection...");
+        ServerSocket serverSocket = new ServerSocket(2135);
         Socket socket = serverSocket.accept();
+        threadMain.interrupt();
+
+
+
 
 
 
