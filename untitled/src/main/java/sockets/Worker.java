@@ -34,6 +34,8 @@ public class Worker implements Callable<Void> {
 
         log("Client is asking : " + request);
         OutputStream os = socket.getOutputStream();
+        CalculatorHeader.incrementCounter(request);
+        System.out.println("Nb Header : " + CalculatorHeader.getValue());
         os.write(getContent(request));
 
         Thread.sleep(10*1000);
@@ -45,7 +47,7 @@ public class Worker implements Callable<Void> {
                 "Content-Length: 38\n" +
                 "Content-Type: text/html\n\n" +
                 "<h1>Je suis un génie (logiciel)</h1>\n";
-        return query.getBytes(StandardCharsets.ISO_8859_1);
+        return query.getBytes();
     }
 
     private void log(String msg) {

@@ -15,6 +15,9 @@ import java.util.Queue;
 import java.util.concurrent.*;
 
 public class Server {
+
+    private static boolean runServer = true;
+
     public void start() throws IOException {
 
         ServerSocket serverSocket = new ServerSocket(2134);
@@ -45,15 +48,15 @@ public class Server {
         serverSocket.close();
     }
 
+
     public static void main(String[] args) throws IOException {
         Server server = new Server();
-        try {
-            server.start();
-        }
-        catch(IOException ex) {
-            System.out.println(ex.toString());
-            System.out.println("Could not connect to the server");
-        }
+            try {
+                server.start();
+            } catch (IOException ex) {
+                System.out.println(ex.toString());
+                System.out.println("Could not connect to the server");
+            }
     }
 
     private void log(String message) {
