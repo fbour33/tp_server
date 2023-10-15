@@ -22,8 +22,8 @@ public class Server {
 
         pool.submit(new ListenStop(Thread.currentThread()));
 
-        log("Waiting for a new connection...");
         while(!Thread.interrupted()){
+            log("Waiting for a new connection...");
             Socket socket = serverSocket.accept();
 
             log("Pile up the thread " + nbThread);

@@ -37,23 +37,24 @@ public class Worker implements Callable<Void> {
         CalculatorHeader.incrementCounter(request);
         os.write(getContent(request));
         os.flush();
+        socket.close();
         Thread.sleep(10*1000);
         log("Response sent: Total headers received : " + CalculatorHeader.getValue());
         return null;
     }
 
     private byte[] getContent(String request) {
+        String answer = "<h1>Je suis un génie (logiciel)</h1>";
         String query = "HTTP/1.1 200 OK\n" +
-                "Content-Length: 38\n" +
+                "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
                 "Content-Type: text/html\n\n" +
-                "<h1>Je suis un génie (logiciel)</h1>\n";
+                answer + "\n";
         return query.getBytes(StandardCharsets.UTF_8);
     }
 
     private void log(String msg) {
         DateFormat format = new SimpleDateFormat("hh:mm:ss.SSS");
         Calendar calendar = Calendar.getInstance();
-
         System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()),  this.id, msg);
     }
 }
