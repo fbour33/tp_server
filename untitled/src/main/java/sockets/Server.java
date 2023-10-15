@@ -37,6 +37,7 @@ public class Server {
 
         log("Waiting for a new connection...");
         while(!Thread.interrupted()){
+            log("Thread.interrupted : " + Thread.interrupted());
             Socket socket = serverSocket.accept();
 
             log("Pile up the thread " + nbThread);
@@ -44,7 +45,7 @@ public class Server {
             this.nbThread++;
             resultList.add(result);
         }
-
+        log("I'm interrupted.");
         for (Future<Void> result : resultList) {
             try {
                 result.get();

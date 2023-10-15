@@ -27,17 +27,11 @@ public class ListenStop implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-
+        log("Start to listen the stop port");
         ServerSocket serverSocket = new ServerSocket(2135);
         Socket socket = serverSocket.accept();
+        log("Interrupt the main thread");
         threadMain.interrupt();
-
-
-
-
-
-
-
         return null;
     }
 
