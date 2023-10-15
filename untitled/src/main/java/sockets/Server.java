@@ -33,17 +33,22 @@ public class Server {
             resultList.add(result);
         }*/
 
-        pool.submit(new ListenStop(Thread.currentThread()));
+        pool.submit(new ListenStop(Thread.currentThread(), serverSocket));
 
         log("Waiting for a new connection...");
         while(!Thread.interrupted()){
             log("Thread.interrupted : " + Thread.interrupted());
-            Socket socket = serverSocket.accept();
 
-            log("Pile up the thread " + nbThread);
-            Future<Void> result = pool.submit(new Worker(socket, nbThread));
-            this.nbThread++;
-            resultList.add(result);
+            try {
+                Socket socket = serverSocket.accept();
+                log("Pile up the thread " + nbThread);
+                Future<Void> result = pool.submit(new Worker(socket, nbThread));
+                this.nbThread++;
+                resultList.add(result);
+            } catch (IOException e) {
+                log("IOException break the boucle");
+                break;
+            }
         }
         log("I'm interrupted.");
         for (Future<Void> result : resultList) {
