@@ -8,18 +8,27 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Queue;
 import java.util.concurrent.*;
+import java.net.Socket;
 
 public class Server {
+    private int nbThread = 0;
+
     public void start() throws IOException {
 
         ServerSocket serverSocket = new ServerSocket(2134);
 
-        ExecutorService pool = Executors.newFixedThreadPool(2);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
         Queue<Future<Void>> resultList = new LinkedBlockingQueue<>();
 
-        for (int id = 0; id<2; id++) {
-            log("Pile up the thread " + id);
-            Future<Void> result = pool.submit(new Worker(serverSocket, id));
+        pool.submit(new ListenStop(Thread.currentThread()));
+
+        log("Waiting for a new connection...");
+        while(!Thread.interrupted()){
+            Socket socket = serverSocket.accept();
+
+            log("Pile up the thread " + nbThread);
+            Future<Void> result = pool.submit(new Worker(socket, nbThread));
+            this.nbThread++;
             resultList.add(result);
         }
 
@@ -42,13 +51,12 @@ public class Server {
 
     public static void main(String[] args) {
         Server server = new Server();
-        try {
-            server.start();
-        }
-        catch(IOException ex) {
-            System.out.println(ex.toString());
-            System.out.println("Could not connect to the server");
-        }
+            try {
+                server.start();
+            } catch (IOException ex) {
+                System.out.println(ex.toString());
+                System.out.println("Could not connect to the server");
+            }
     }
 
     private void log(String message) {
