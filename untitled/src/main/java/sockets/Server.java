@@ -60,7 +60,7 @@ public class Server {
     }
 
     private void log(String message) {
-        DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
+        DateFormat format = new SimpleDateFormat("hh:mm:ss.SSS");
         Calendar calendar = Calendar.getInstance();
 
         System.out.printf("%s [Main]: %s \n", format.format(calendar.getTime()),  message);
