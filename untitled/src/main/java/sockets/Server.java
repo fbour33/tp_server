@@ -20,18 +20,24 @@ public class Server {
         ExecutorService pool = Executors.newFixedThreadPool(3);
         Queue<Future<Void>> resultList = new LinkedBlockingQueue<>();
 
-        pool.submit(new ListenStop(Thread.currentThread()));
+        pool.submit(new ListenStop(Thread.currentThread(), serverSocket));
 
+        log("Waiting for a new connection...");
         while(!Thread.interrupted()){
-            log("Waiting for a new connection...");
-            Socket socket = serverSocket.accept();
+            log("Thread.interrupted : " + Thread.interrupted());
 
-            log("Pile up the thread " + nbThread);
-            Future<Void> result = pool.submit(new Worker(socket, nbThread));
-            this.nbThread++;
-            resultList.add(result);
+            try {
+                Socket socket = serverSocket.accept();
+                log("Pile up the thread " + nbThread);
+                Future<Void> result = pool.submit(new Worker(socket, nbThread));
+                this.nbThread++;
+                resultList.add(result);
+            } catch (IOException e) {
+                log("IOException break the loop");
+                break;
+            }
         }
-
+        log("I'm interrupted.");
         for (Future<Void> result : resultList) {
             try {
                 result.get();
