@@ -1,23 +1,16 @@
 package sockets;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.*;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.*;
+import java.net.Socket;
 
 public class Server {
-
-    //private static boolean runServer = true;
-
     private int nbThread = 0;
 
     public void start() throws IOException {
@@ -27,24 +20,24 @@ public class Server {
         ExecutorService pool = Executors.newFixedThreadPool(3);
         Queue<Future<Void>> resultList = new LinkedBlockingQueue<>();
 
-        /*for (int id = 0; id<2; id++) {
-            log("Pile up the thread " + id);
-            Future<Void> result = pool.submit(new Worker(serverSocket, id));
-            resultList.add(result);
-        }*/
-
-        pool.submit(new ListenStop(Thread.currentThread()));
+        pool.submit(new ListenStop(Thread.currentThread(), serverSocket));
 
         log("Waiting for a new connection...");
         while(!Thread.interrupted()){
-            Socket socket = serverSocket.accept();
+            log("Thread.interrupted : " + Thread.interrupted());
 
-            log("Pile up the thread " + nbThread);
-            Future<Void> result = pool.submit(new Worker(socket, nbThread));
-            this.nbThread++;
-            resultList.add(result);
+            try {
+                Socket socket = serverSocket.accept();
+                log("Pile up the thread " + nbThread);
+                Future<Void> result = pool.submit(new Worker(socket, nbThread));
+                this.nbThread++;
+                resultList.add(result);
+            } catch (IOException e) {
+                log("IOException break the loop");
+                break;
+            }
         }
-
+        log("I'm interrupted.");
         for (Future<Void> result : resultList) {
             try {
                 result.get();
@@ -62,7 +55,7 @@ public class Server {
         serverSocket.close();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Server server = new Server();
             try {
                 server.start();
@@ -73,8 +66,7 @@ public class Server {
     }
 
     private void log(String message) {
-        DateFormat format = new SimpleDateFormat("hh:mm:ss.zzz");
-        Date date = new Date();
+        DateFormat format = new SimpleDateFormat("hh:mm:ss.SSS");
         Calendar calendar = Calendar.getInstance();
 
         System.out.printf("%s [Main]: %s \n", format.format(calendar.getTime()),  message);
