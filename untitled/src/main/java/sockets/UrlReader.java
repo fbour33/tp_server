@@ -3,8 +3,6 @@ package sockets;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.*;
-
 
 
 public class UrlReader {
@@ -22,27 +20,27 @@ public class UrlReader {
         return null;
     }*/
 
+    //Return the request parsed into lines
     private static String[] getLinesRequest(String request) {
         return request.split("\r\n");
     }
 
-    private static String[] parseLine(String line, String parser){
-        return line.split(parser);
-    }
-
+    //Return one line of the request parsed
     private static String getOneLineRequest(String request, int index){
         String[] linesRequest = getLinesRequest(request); //Line not parsed
         return linesRequest[index];
     }
 
-    private static String[] getPathQuery(String request){
+    //Return an array of the path and the query
+    public static String[] getPathQuery(String request){
         String getLine = getOneLineRequest(request, 0);
-        String[] pathQuery = parseLine(getLine, " ");
+        String[] pathQuery = getLine.split(" ");
         if(pathQuery.length == 3 && pathQuery[0].equals("GET"))
-            return parseLine(pathQuery[1], "?");
+            return pathQuery[1].split("\\?");
         return null;
     }
 
+    //Return the path of the html file
     public static String getFile(String request){
         String[] pathQuery = getPathQuery(request);
         if(pathQuery != null && pathQuery[0].startsWith("/") && !pathQuery[0].equals("/"))
@@ -50,17 +48,16 @@ public class UrlReader {
         return null;
     }
 
-    public static String getVariable(String request, String variable){
+    //Return an array of the name and the value of the variable in the URL
+    public static String[] getNameVariable(String request){
         String[] pathQuery = getPathQuery(request);
-        if(pathQuery != null) {
-            String[] parsedQuery = parseLine(pathQuery[1], "=");
-            if (parsedQuery[0].equals(variable)) {
-                return parsedQuery[1];
-            }
+        if(pathQuery != null && pathQuery.length > 1) {
+            return pathQuery[1].split("=");
         }
         return null;
     }
 
+    //Read the file and return the content
     public static StringBuilder readFile(URL url) {
         if(url != null){
             try (InputStream inputStream = url.openStream()){

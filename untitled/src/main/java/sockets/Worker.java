@@ -76,11 +76,14 @@ public class Worker implements Callable<Void> {
     }*/
 
     private byte[] getContent(String request) {
-        //String getLine = UrlReader.getOneLineRequest(request, 0);
-        String fileName = null;//UrlReader.getFile(request);
+        String[] pathQuery = UrlReader.getPathQuery(request);
+        String fileName = UrlReader.getFile(request);
+        String[] nameVariable = UrlReader.getNameVariable(request);
         if(fileName != null) {
             StringBuilder answerBuilder = UrlReader.readFile(getClass().getResource(fileName));
             if (answerBuilder != null) {
+                if(nameVariable != null)
+                    answerBuilder = new StringBuilder(answerBuilder.toString().replace("${" + nameVariable[0] + "}", nameVariable[1]));
                 String answer = answerBuilder.toString();
                 String query = "HTTP/1.1 200 OK\n" +
                         "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
