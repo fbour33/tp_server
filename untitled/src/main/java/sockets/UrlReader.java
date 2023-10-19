@@ -7,19 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class UrlReader {
 
-    /*public static String getFileName(String request) {
-        String[] requestLines = request.split("\r\n");
-        String[] hostParts = requestLines[1].split(": ");
-        String[] requestParts = requestLines[0].split(" ");
-        if (requestParts.length == 3 && hostParts.length == 2) {
-            String method = requestParts[0];
-            String path = requestParts[1];
-            if (method.equals("GET") && path.startsWith("/"))
-                return path;
-        }
-        return null;
-    }*/
-
     //Return the request parsed into lines
     private static String[] getLinesRequest(String request) {
         return request.split("\r\n");
@@ -31,7 +18,7 @@ public class UrlReader {
         return linesRequest[index];
     }
 
-    //Return an array of the path and the query
+    //Return an array of the path and the querys
     public static String[] getPathQuery(String request){
         String getLine = getOneLineRequest(request, 0);
         String[] pathQuery = getLine.split(" ");
@@ -48,11 +35,13 @@ public class UrlReader {
         return null;
     }
 
+
     //Return an array of the name and the value of the variable in the URL
-    public static String[] getNameVariable(String request){
+    // For instance, ["name1", "Florian", "name2", "Thomas", "name3", "Victor"]
+    public static String[] getVariables(String request){
         String[] pathQuery = getPathQuery(request);
         if(pathQuery != null && pathQuery.length > 1) {
-            return pathQuery[1].split("=");
+            return pathQuery[1].split("[&=]");
         }
         return null;
     }

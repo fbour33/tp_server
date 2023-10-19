@@ -12,7 +12,8 @@ import java.util.concurrent.Callable;
 public class Worker implements Callable<Void> {
     private final Socket socket;
     private final int id;
-    public Worker(Socket socket, int id){
+
+    public Worker(Socket socket, int id) {
         this.socket = socket;
         this.id = id;
     }
@@ -37,7 +38,7 @@ public class Worker implements Callable<Void> {
         os.write(getContent(request));
         os.flush();
         socket.close();
-        Thread.sleep(10*1000);
+        Thread.sleep(10 * 1000);
         log("Response sent: Total headers received : " + CalculatorHeader.getValue());
         return null;
     }
@@ -78,12 +79,15 @@ public class Worker implements Callable<Void> {
     private byte[] getContent(String request) {
         String[] pathQuery = UrlReader.getPathQuery(request);
         String fileName = UrlReader.getFile(request);
-        String[] nameVariable = UrlReader.getNameVariable(request);
-        if(fileName != null) {
+        String[] nameVariables = UrlReader.getVariables(request);
+        if (fileName != null) {
             StringBuilder answerBuilder = UrlReader.readFile(getClass().getResource(fileName));
             if (answerBuilder != null) {
-                if(nameVariable != null)
-                    answerBuilder = new StringBuilder(answerBuilder.toString().replace("${" + nameVariable[0] + "}", nameVariable[1]));
+                if (nameVariables != null) {
+                    for (int i = 0; i < nameVariables.length; i+=2) {
+                        answerBuilder = new StringBuilder(answerBuilder.toString().replace("${" + nameVariables[i] + "}", nameVariables[i+1]));
+                    }
+                }
                 String answer = answerBuilder.toString();
                 String query = "HTTP/1.1 200 OK\n" +
                         "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
@@ -103,6 +107,6 @@ public class Worker implements Callable<Void> {
     private void log(String msg) {
         DateFormat format = new SimpleDateFormat("hh:mm:ss.SSS");
         Calendar calendar = Calendar.getInstance();
-        System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()),  this.id, msg);
+        System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()), this.id, msg);
     }
 }
