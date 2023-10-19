@@ -43,7 +43,7 @@ public class Worker implements Callable<Void> {
     }
 
 
-    private String getFileName(String request) {
+    /*private String getFileName(String request) {
         String[] requestLines = request.split("\r\n");
         String[] hostParts = requestLines[1].split(": ");
         String[] requestParts = requestLines[0].split(" ");
@@ -73,18 +73,21 @@ public class Worker implements Callable<Void> {
             }
         }
         return null;
-    }
+    }*/
 
     private byte[] getContent(String request) {
-        String fileName = getFileName(request);
-        StringBuilder answerBuilder = readFile(fileName);
-        if(fileName != null && answerBuilder != null) {
-            String answer = answerBuilder.toString();
-            String query = "HTTP/1.1 200 OK\n" +
-                    "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
-                    "Content-Type: text/html\n\n" +
-                    answer + "\n";
-            return query.getBytes(StandardCharsets.UTF_8);
+        //String getLine = UrlReader.getOneLineRequest(request, 0);
+        String fileName = null;//UrlReader.getFile(request);
+        if(fileName != null) {
+            StringBuilder answerBuilder = UrlReader.readFile(getClass().getResource(fileName));
+            if (answerBuilder != null) {
+                String answer = answerBuilder.toString();
+                String query = "HTTP/1.1 200 OK\n" +
+                        "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
+                        "Content-Type: text/html\n\n" +
+                        answer + "\n";
+                return query.getBytes(StandardCharsets.UTF_8);
+            }
         }
         String answer = "<h1>File not found</h1>";
         String query = "HTTP/1.1 404 Not Found\n" +
