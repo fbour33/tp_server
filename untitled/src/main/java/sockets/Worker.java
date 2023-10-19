@@ -1,9 +1,8 @@
 package sockets;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,7 +12,8 @@ import java.util.concurrent.Callable;
 public class Worker implements Callable<Void> {
     private final Socket socket;
     private final int id;
-    public Worker(Socket socket, int id){
+
+    public Worker(Socket socket, int id) {
         this.socket = socket;
         this.id = id;
     }
@@ -38,14 +38,66 @@ public class Worker implements Callable<Void> {
         os.write(getContent(request));
         os.flush();
         socket.close();
-        Thread.sleep(10*1000);
+        Thread.sleep(10 * 1000);
         log("Response sent: Total headers received : " + CalculatorHeader.getValue());
         return null;
     }
 
+
+    /*private String getFileName(String request) {
+        String[] requestLines = request.split("\r\n");
+        String[] hostParts = requestLines[1].split(": ");
+        String[] requestParts = requestLines[0].split(" ");
+        if (requestParts.length == 3 && hostParts.length == 2) {
+            String method = requestParts[0];
+            String path = requestParts[1];
+            if (method.equals("GET") && path.startsWith("/"))
+                return path;
+        }
+        return null;
+    }
+
+    private StringBuilder readFile(String fileName) {
+        File file = new File(fileName);
+        URL url = getClass().getResource(file.getAbsolutePath());
+        if(url != null){
+            try (InputStream inputStream = url.openStream()){
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
+                return content;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }*/
+
     private byte[] getContent(String request) {
-        String answer = "<h1>Je suis un génie (logiciel)</h1>";
-        String query = "HTTP/1.1 200 OK\n" +
+        String[] pathQuery = UrlReader.getPathQuery(request);
+        String fileName = UrlReader.getFile(request);
+        String[] nameVariables = UrlReader.getVariables(request);
+        if (fileName != null) {
+            StringBuilder answerBuilder = UrlReader.readFile(getClass().getResource(fileName));
+            if (answerBuilder != null) {
+                if (nameVariables != null) {
+                    for (int i = 0; i < nameVariables.length; i+=2) {
+                        answerBuilder = new StringBuilder(answerBuilder.toString().replace("${" + nameVariables[i] + "}", nameVariables[i+1]));
+                    }
+                }
+                String answer = answerBuilder.toString();
+                String query = "HTTP/1.1 200 OK\n" +
+                        "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
+                        "Content-Type: text/html\n\n" +
+                        answer + "\n";
+                return query.getBytes(StandardCharsets.UTF_8);
+            }
+        }
+        String answer = "<h1>File not found</h1>";
+        String query = "HTTP/1.1 404 Not Found\n" +
                 "Content-Length: " + answer.getBytes(StandardCharsets.UTF_8).length + "\n" +
                 "Content-Type: text/html\n\n" +
                 answer + "\n";
@@ -55,6 +107,6 @@ public class Worker implements Callable<Void> {
     private void log(String msg) {
         DateFormat format = new SimpleDateFormat("hh:mm:ss.SSS");
         Calendar calendar = Calendar.getInstance();
-        System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()),  this.id, msg);
+        System.out.printf("%s [Thread %d]: %s \n", format.format(calendar.getTime()), this.id, msg);
     }
 }
