@@ -24,7 +24,7 @@ public class TruckRepository {
         truckList.remove(id, truck);
     }
 
-    public Truck getTruckById(Long id){
+    public Truck getTruckById(Long id) throws IllegalArgumentException {
         Truck truck = truckList.get(id);
         if(truck == null){
             throw new IllegalArgumentException("Truck does not exist");
