@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.ArrayList;
 
 @RestController
@@ -15,12 +16,13 @@ public class MessageController {
     @Autowired Consumer consumer;
 
     @GetMapping("/messages")
-    public ArrayList<String> getMessages() {
+    public ArrayList<MessageFormat> getMessages() {
         return consumer.returnMessages();
     }
 
     @PostMapping("/messages")
-    public String post(@RequestBody String msg) {
+    public String post(@RequestBody MessageFormat msg) {
+
         producer.postMessage(msg);
         return "Message added correctly";
     }

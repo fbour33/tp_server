@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class Producer {
 
-    public static final String TOPIC = "msg.txt";
+    public static final String TOPIC = "mousquetaires.json";
     private final Logger log = LoggerFactory.getLogger(Producer.class);
 
     @Autowired
-    KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, MessageFormat> kafkaTemplate;
 
-    public void postMessage(String msg){
+    public void postMessage(MessageFormat msg){
         log.info("Application starting");
         kafkaTemplate.send(TOPIC, msg);
     }
