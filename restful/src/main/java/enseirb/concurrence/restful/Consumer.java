@@ -12,7 +12,7 @@ public class Consumer {
 
   @Autowired TruckService truckService;
 
-    @KafkaListener(id = "coucou", topics = "trucks.position")
+    @KafkaListener(id = "coucouille", topics = "trucks.position")
     public void receive(Truck truck){
         truckService.addTruck(truck);
     }

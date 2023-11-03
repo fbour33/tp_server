@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 
-@RestController("/truck")
+@RestController
+@RequestMapping("/truck")
 public class TruckController {
 
     //@Autowired Producer producer;

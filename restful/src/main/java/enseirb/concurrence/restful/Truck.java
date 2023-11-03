@@ -4,9 +4,11 @@ package enseirb.concurrence.restful;
 import java.time.Instant;
 
 public class Truck {
-    private final int truckId;
+    private int truckId;
     private Instant ts;
     private Position position;
+
+    public Truck(){}
 
     public Truck(int truckId, Instant ts, Position position) {
         this.truckId = truckId;
@@ -22,16 +24,12 @@ public class Truck {
         return ts;
     }
 
-    public double getLongitude() {
-        return position.getLongitude();
-    }
-
-    public double getLatitude() {
-        return position.getLatitude();
-    }
-
     public Position getPosition() {
         return position;
+    }
+
+    public void setTruckId(int truckId) {
+        this.truckId = truckId;
     }
 
     public void setTs(Instant ts) {

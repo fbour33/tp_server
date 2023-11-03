@@ -4,7 +4,8 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        spring.json.trusted.packages: "enseirb.concurrence.restful"
-      auto-offset-reset: latest
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: enseirb.concurrence.restful.Truck
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
