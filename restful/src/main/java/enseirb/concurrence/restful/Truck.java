@@ -4,38 +4,41 @@ package enseirb.concurrence.restful;
 import java.time.Instant;
 
 public class Truck {
-    private String licencePlate;
-        private Instant firstReleaseDate;
-        private int unloadedWeight;
+    private final int truckId;
+    private Instant ts;
+    private Position position;
 
-    // Constructor without argument for JSON deserialization
-    public Truck() {
-    }
-
-    public Truck(String licencePlate, Instant firstReleaseDate, int unloadedWeight){
-        this.licencePlate = licencePlate;
-        this.firstReleaseDate = firstReleaseDate;
-        this.unloadedWeight = unloadedWeight;
+    public Truck(int truckId, Instant ts, Position position) {
+        this.truckId = truckId;
+        this.ts = ts;
+        this.position = position;
     }
 
-    public int getUnloadedWeight() {
-        return unloadedWeight;
+    public int getTruckId() {
+        return truckId;
     }
 
-    public Instant getFirstReleaseDate() {
-        return firstReleaseDate;
-    }
-    public String getLicencePlate() {
-        return licencePlate;
-    }
-    public void setFirstReleaseDate(Instant firstReleaseDate) {
-        this.firstReleaseDate = firstReleaseDate;
-    }
-    public void setLicencePlate(String licencePlate) {
-        this.licencePlate = licencePlate;
+    public Instant getTs() {
+        return ts;
     }
 
-    public void setUnloadedWeight(int unloadedWeight) {
-        this.unloadedWeight = unloadedWeight;
+    public double getLongitude() {
+        return position.getLongitude();
+    }
+
+    public double getLatitude() {
+        return position.getLatitude();
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setTs(Instant ts) {
+        this.ts = ts;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }
