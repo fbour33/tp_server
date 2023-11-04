@@ -25,10 +25,8 @@ public class TruckController {
         }
     }
 
-    /*@PostMapping("/messages")
-    public String post(@RequestBody MessageFormat msg) {
-
-        producer.postMessage(msg);
+    @GetMapping("/{id}/map")
+    public String redirectToTheLastPosition(@PathVariable int id) {
         return "Message added correctly";
-    }*/
+    }
 }
