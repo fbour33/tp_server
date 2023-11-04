@@ -2,8 +2,11 @@ package enseirb.concurrence.restful;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 
 import java.util.ArrayList;
@@ -27,12 +30,15 @@ public class TruckController {
     }
 
     @GetMapping("/{id}/map")
-    public ResponseEntity<String> redirectToTheLastPosition(@PathVariable int id) {
+    public ModelAndView redirectToTheLastPosition(@PathVariable int id, ModelMap model) {
+        Position position;
         try {
-            Position position = truckService.getTruckPosition(id);
-            return ResponseEntity.ok(mapFromPositionService.getMapWithPosition(position));
+             position = truckService.getTruckPosition(id);
         } catch (IllegalAccessException e){
-            return ResponseEntity.notFound().build();
+            return new ModelAndView("error404", HttpStatus.NOT_FOUND);
         }
+        String redirectUrl = mapFromPositionService.getMapWithPosition(position);
+        model.addAttribute("attribute", "redirectWithRedirectPrefix");
+        return new ModelAndView("redirect:" + redirectUrl, model);
     }
 }
