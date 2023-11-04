@@ -8,10 +8,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 @ComponentScan("enseirb.concurrence.restful")
 public class WebClientConfig {
-    public static final String TRUCK_URL = "http://localhost:8080";
+    public static final String MAP_URL = "http://breisen.datamix.ovh:8080";
 
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().baseUrl(TRUCK_URL).build();
+        return WebClient.builder().baseUrl(MAP_URL).build();
     }
 }

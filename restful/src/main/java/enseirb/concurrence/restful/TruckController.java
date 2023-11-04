@@ -14,6 +14,7 @@ public class TruckController {
 
     //@Autowired Producer producer;
     @Autowired TruckService truckService;
+    @Autowired MapFromPositionService mapFromPositionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Position> getTruckById(@PathVariable int id) {
@@ -26,7 +27,12 @@ public class TruckController {
     }
 
     @GetMapping("/{id}/map")
-    public String redirectToTheLastPosition(@PathVariable int id) {
-        return "Message added correctly";
+    public ResponseEntity<String> redirectToTheLastPosition(@PathVariable int id) {
+        try {
+            Position position = truckService.getTruckPosition(id);
+            return ResponseEntity.ok(mapFromPositionService.getMapWithPosition(position));
+        } catch (IllegalAccessException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }
