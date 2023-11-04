@@ -14,8 +14,12 @@ public class TruckService {
         trucks.put(truck.getTruckId(), truck);
     }
 
-    public Position getTruckPosition(int id){
-        return trucks.get(id).getPosition();
+    public Position getTruckPosition(int id) throws IllegalAccessException{
+        if (trucks.get(id) != null){
+            return trucks.get(id).getPosition();
+        } else {
+            throw new IllegalAccessException("The id of the truck doesn't exist!");
+        }
     }
 
 }
