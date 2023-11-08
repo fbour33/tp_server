@@ -1,9 +1,11 @@
 spring:
   kafka:
     bootstrap-servers: breisen.datamix.ovh:9093
-    producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      ack-mode: manual
     consumer:
+      enable-auto-commit: false
+      auto-offset-reset: latest
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.json.use.type.headers: false
