@@ -1,5 +1,6 @@
 package enseirb.concurrence.restful;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,14 @@ public class TruckController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getTruckById(@PathVariable int id) {
         try{
-            return new ResponseEntity<Position>(truckService.getTruckPosition(id), HttpStatus.OK);
+            return new ResponseEntity<>(truckService.getTruckPosition(id), HttpStatus.OK);
         }catch(IllegalAccessException e){
             return new ResponseEntity<String>("Truck id doesn't exist, error 404",HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/{id}/map")
-    public ModelAndView getUrlMap(@PathVariable int id, ModelMap model){
+    public ModelAndView getUrlMap(@PathVariable int id, ModelMap model, HttpServletResponse response){
         Position position;
         try {
             position = truckService.getTruckPosition(id);
@@ -35,6 +36,7 @@ public class TruckController {
         }
         String stringURL = mapFromPositionService.getUrlMap(position);
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
+        //response.sendRedirect();
         return new ModelAndView("redirect:" + stringURL, model);
     }
 }
